@@ -13,7 +13,7 @@
             </div>
           </div>
         </div>
-        <!--<p >{{latitude}}****{{longitude}}</p>
+       <!-- <p >{{latitude}}****{{longitude}}</p>
         <button @click="getLocation">试一下2z</button>-->
         <!--金额输入框-->
         <div  class="payprice" v-click-outside="hideKeyboard">
@@ -119,6 +119,7 @@
 			return{
         longitude:'', //经度
         latitude:'', //纬度
+        fence:1,
         imgBg,
         imgCloseBg,
         iconCheck,
@@ -179,6 +180,15 @@
 			if(storeId != null && storeId != '' && storeId){
 				this.storeId = storeId
 			}
+      // 电子围栏开关
+      // let fence = sessionStorage.getItem('fence')
+      this.fence = this.$route.query.fence
+      if(this.fence == -1){
+
+      }else if(this.fence == 1){
+        this.getLocation();
+      }
+      // alert('1fence:'+this.fence)
       // 预下单
       let goodsOrderId = sessionStorage.getItem("goodsOrderId")
       if (goodsOrderId != null && goodsOrderId != '' && goodsOrderId != 'null' && goodsOrderId != 'undefined' && goodsOrderId) {
@@ -224,18 +234,16 @@
       */
     },
 		methods:{
-      getLocation()
-      {
+      getLocation() {
         if (navigator.geolocation)
         {
           navigator.geolocation.getCurrentPosition(this.showPosition,this.positionError);
         }
         else{this.latitude="Geolocation is not supported by this browser.";}
       },
-      showPosition(position)
-      {
+      showPosition(position) {
         this.latitude= position.coords.latitude
-          this.longitude = position.coords.longitude;
+        this.longitude = position.coords.longitude;
       },
       positionError(err) {
         alert('ERROR(' + err.code + '): ' + 'GPS访问被拒绝 或 GPS未开启')
@@ -435,6 +443,29 @@
         this.showMask = true
         let  md5Str = sessionStorage.getItem('md5Str')
         let  timestramp = sessionStorage.getItem('timestramp')
+        let params = {
+          scanAppType: 2, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
+          payWay: 2,
+          totalPrice: this.payMoney,
+          userId: this.userId,
+          // openId: this.openId,
+          storeId: this.storeId,
+          // discountPrice: this.discountPrice,
+          // memberId: this.memberId,
+          // code: this.code,
+          // merchantId: this.merchantId,
+
+          uuid: uuid,
+          equipmentId: equipmentId,
+          // remarks: '',
+          md5Str: this.md5Str,
+          timestramp: this.timestramp,
+          goodsOrderId: params.goodsOrderId,
+          hbFqNum: this.hbFqNum,
+          longitude: this.longitude,
+          latitude: this. latitude,
+          fence: this.fence,
+        }
 				getWebPay(2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum).then(res => {
 					this.testProcess = '付款接口调取成功，进行付款跳转'
 					console.log(res)

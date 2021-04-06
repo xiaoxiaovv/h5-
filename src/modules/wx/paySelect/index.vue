@@ -14,16 +14,16 @@
             </div>
           </div>
         </div>
-        <!--<p >{{ latitude}}****{{ longitude}}</p>
+        <p >{{ latitude}}****{{ longitude}}</p>
         <p>错误：{{errorData}}</p>
-        <button @click="getLocation">试一下4w</button>-->
-        <!--金额输入框-->
+        <button @click="getLocation">试一下4w</button>
+        金额输入框
         <div class="payprice"
              v-click-outside="hideKeyboard">
           <div class="payprice-container"
                @click.stop="showKeyboard">
             <div class="payprice-body justcenter">
-              <div class="payprice-tips">支付金额</div>
+              <div class="payprice-tips">2支付金额</div>
               <div class="payprice-value"
                    :class="{'cursor-blue':showKeyboardStatus}"><span>¥</span>{{paymentMoney}}</div>
               <div class="payprice-tipred">{{priceTip}}</div>
@@ -389,6 +389,7 @@ export default {
       errorData:'',
       longitude:'', //经度
       latitude:'', //纬度
+      fence: 1,
       imgBg,
       imgCloseBg,
       iconCheck,
@@ -542,6 +543,16 @@ export default {
     }
   },
   mounted() {
+    // 电子围栏开关
+    // let fence = sessionStorage.getItem('fence')
+    this.fence = this.$route.query.fence
+    alert('2fence:'+this.fence)
+
+    if(this.fence == -1){
+
+    }else if(this.fence == 1){
+      this.getLocation();
+    }
     // var x=document.getElementById("demo");
     this.getshowMemberPay()
     // this.weichatLatAndLon()
@@ -611,8 +622,8 @@ export default {
       });
     },*/
 
-    getLocation()
-    {
+    getLocation() {
+      alert('开始定位')
       if (navigator.geolocation)
       {
         navigator.geolocation.getCurrentPosition(this.showPosition,this.positionError);
@@ -621,6 +632,7 @@ export default {
     },
     showPosition(position)
     {
+      alert(this.latitude+'--'+this.longitude)
       this.latitude= position.coords.latitude
       this.longitude = position.coords.longitude;
     },
@@ -862,7 +874,29 @@ export default {
       let uuid = initParams(this.$route.query.uuid)
       let equipmentId = initParams(this.$route.query.equipmentId)
       let that = this
-      getWebPay(4, this.actualPayment, this.userId, this.storeId, uuid, equipmentId, '', this.md5Str, this.timestramp, this.goodsOrderId, '', this.openId, this.discountPrice, this.memberId, this.code, this.merchantId).then(res => {
+      let params = {
+        scanAppType: 1, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
+        payWay: 4,
+        totalPrice: this.actualPayment,
+        userId: this.userId,
+        openId: this.openId,
+        storeId: this.storeId,
+        discountPrice: this.discountPrice,
+        memberId: this.memberId,
+        code: this.code,
+        merchantId: this.merchantId,
+        longitude: this.longitude,
+        latitude: this. latitude,
+        fence: this.fence,
+        uuid: uuid,
+        equipmentId: equipmentId,
+        remarks: '',
+        md5Str: this.md5Str,
+        timestramp: this.timestramp,
+        goodsOrderId: this.goodsOrderId,
+        hbFqNum: ''
+      }
+      getWebPay(params/*4, this.actualPayment, this.userId, this.storeId, uuid, equipmentId, '', this.md5Str, this.timestramp, this.goodsOrderId, '', this.openId, this.discountPrice, this.memberId, this.code, this.merchantId*/).then(res => {
         console.log(res)
         that.price = res.obj.price
         that.timeStamp = res.obj.timeStamp
@@ -1035,11 +1069,34 @@ export default {
       return url
     },
     /* 付款 */
-    payment(params) {
+    payment(param) {
       // this.testProcess = '进行付款'
       let uuid = initParams(this.$route.query.uuid)
       let equipmentId = initParams(this.$route.query.equipmentId)
-      getWebPay(1, params.paymentMoney, params.userId, params.storeId, uuid, equipmentId, this.wxRemark, this.md5Str, this.timestramp, params.goodsOrderId, '', params.openId, params.discountPrice, params.memberId, params.code, params.merchantId).then(res => {
+      let params = {
+        scanAppType: 1, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
+        payWay: 1,
+        totalPrice: param.paymentMoney,
+        userId: param.userId,
+        openId: param.openId,
+        storeId: param.storeId,
+        discountPrice: param.discountPrice,
+        memberId: param.memberId,
+        code: param.code,
+        merchantId: param.merchantId,
+        longitude: this.longitude,
+        latitude: this. latitude,
+        fence: this.fence,
+        uuid: uuid,
+        equipmentId: equipmentId,
+        remarks: this.wxRemark,
+        md5Str: this.md5Str,
+        timestramp: this.timestramp,
+        goodsOrderId: param.goodsOrderId,
+        hbFqNum: ''
+      }
+      alert('params'+params.longitude)
+      getWebPay(params/*1, param.paymentMoney, param.userId, param.storeId, uuid, equipmentId, this.wxRemark, this.md5Str, this.timestramp, param.goodsOrderId, '', param.openId, param.discountPrice, param.memberId, param.code, param.merchantId*/).then(res => {
         // this.testProcess = '付款接口调取成功，进行付款跳转'
         console.log(res)
         this.testRes = JSON.stringify(res)

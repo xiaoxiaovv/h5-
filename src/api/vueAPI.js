@@ -13,8 +13,8 @@ export const baseURL = window.serverUrl || window.location.protocol + '//' + win
  */
 
 /* 网页支付 */
-export function getWebPay (payWay, totalPrice, userId='', storeId='', uuid = '', equipmentId = '', remarks = '',md5Str = '',timestramp = '', goodsOrderId = '', hbFqNum = '', openId = '', discountPrice='', memberId='', code='', merchantId = '') {
-	return fly.request( '/order/app/web_pay', qs.stringify({
+export function getWebPay (params/*payWay, totalPrice, userId='', storeId='', uuid = '', equipmentId = '', remarks = '',md5Str = '',timestramp = '', goodsOrderId = '', hbFqNum = '', openId = '', discountPrice='', memberId='', code='', merchantId = '',fence='-1'*/) {
+	return fly.request( '/order/app/web_pay', qs.stringify(params/*{
 		payWay,
 		totalPrice,
 		userId,
@@ -24,6 +24,7 @@ export function getWebPay (payWay, totalPrice, userId='', storeId='', uuid = '',
 		memberId,
 		code,
 		merchantId,
+    fence,
     uuid,
     equipmentId,
     remarks,
@@ -32,7 +33,7 @@ export function getWebPay (payWay, totalPrice, userId='', storeId='', uuid = '',
     goodsOrderId,
     hbFqNum
     // kdbGcs:'114.515622|37.080864'
-	}),{
+	}*/),{
 		method: 'post',
 	})
 }

@@ -129,7 +129,26 @@
 			/* 付款 */
 			payment() {
 				// this.testProcess = '进行付款'
-				getWebPay(1, this.payMoney, this.userId, this.openId, this.storeId, this.discountPrice, this.memberId, this.code, this.merchantId).then(res => {
+        let params = {
+          payWay: 1,
+          totalPrice: this.payMoney,
+          userId: this.userId,
+          openId: this.openId,
+          storeId: this.storeId,
+          discountPrice: this.discountPrice,
+          memberId: this.memberId,
+          code: this.code,
+          merchantId: this.merchantId,
+          fence: '',
+          uuid: '',
+          equipmentId: '',
+          remarks: '',
+          md5Str: '',
+          timestramp: '',
+          goodsOrderId: '',
+          hbFqNum: ''
+        }
+				getWebPay(params/*1, this.payMoney, this.userId, this.openId, this.storeId, this.discountPrice, this.memberId, this.code, this.merchantId*/).then(res => {
 					// this.testProcess = '付款接口调取成功，进行付款跳转'
 					console.log(res)
 					this.testRes = JSON.stringify(res)

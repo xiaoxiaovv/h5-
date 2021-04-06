@@ -51,6 +51,15 @@
       // this.testText = ( ua.match(/MicroMessenger/i) == 'micromessenger' )? '微信':'非微信';
       // this.testArr = (ua.match(/AlipayClient/i) == 'alipayclient')? '支付宝':'非支付宝';
       /* 接收信息，空的则拒绝保存 */
+      // alert('url:=========='+this.$route);
+      // 电子围栏开关
+      // let fence = this.$route.query.fence;
+      // alert('fence-index:'+fence)
+      /*if(fence != null && fence != '' && fence != 'null' && fence){
+        sessionStorage.setItem('fence',fence)
+      } else {
+        sessionStorage.removeItem('fence')
+      }*/
       let userId = this.$route.query.userId;
       if(userId != null && userId != '' && userId != 'null' && userId){
         sessionStorage.setItem('userId',userId)
@@ -98,6 +107,8 @@
       } else {
         sessionStorage.removeItem('hbFqNum')
       }
+      // todo return
+      // return
 
       let ua = window.navigator.userAgent.toLowerCase();
       if(ua.match(/MicroMessenger/i) == 'micromessenger'){
@@ -125,13 +136,15 @@
         window.location.href = baseURL + "/order/app/wx_login?userId="+ this.$route.query.userId + queryStr // 跳转外部链接
         this.turnToLogin(this.reloadTime + 1)
       } else if (ua.match(/AlipayClient/i) == 'alipayclient'){
+        // alert('zhifubaofence '+this.$route.query.fence)
         let uuid = initParams(this.$route.query.uuid)
         let equipmentId = initParams(this.$route.query.equipmentId)
         this.$router.push({
           path:'/zfb/paySuccess',
           query:{
             uuid: uuid,
-            equipmentId: equipmentId
+            equipmentId: equipmentId,
+            fence: this.$route.query.fence
           }	//传参
         })
       } else {
