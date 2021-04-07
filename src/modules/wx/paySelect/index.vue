@@ -14,16 +14,16 @@
             </div>
           </div>
         </div>
-        <p >{{ latitude}}****{{ longitude}}</p>
+        <!--<p >{{ latitude}}****{{ longitude}}</p>
         <p>错误：{{errorData}}</p>
         <button @click="getLocation">试一下4w</button>
-        金额输入框
+        金额输入框-->
         <div class="payprice"
              v-click-outside="hideKeyboard">
           <div class="payprice-container"
                @click.stop="showKeyboard">
             <div class="payprice-body justcenter">
-              <div class="payprice-tips">2支付金额</div>
+              <div class="payprice-tips">支付金额</div>
               <div class="payprice-value"
                    :class="{'cursor-blue':showKeyboardStatus}"><span>¥</span>{{paymentMoney}}</div>
               <div class="payprice-tipred">{{priceTip}}</div>
@@ -382,10 +382,13 @@ import iconChecked from '@/assets/iconimg/icon-checked.png'
 import iconWeixin from '@/assets/iconimg/icon-weixin.png'
 import iconBank from '@/assets/iconimg/icon-bank.png'
 import keyboard from '@/components/keyboard.vue'
+import AMapLoader from '@amap/amap-jsapi-loader';
+import loading from '@/common/loading.js'
 export default {
   components: { keyboard },
   data() {
     return {
+      geolocation:null,
       errorData:'',
       longitude:'', //经度
       latitude:'', //纬度
@@ -512,6 +515,32 @@ export default {
     // window.location.href = ''
     this.getMemberCouponList();
     this.getMerchantInfo()
+    AMapLoader.load({
+      "key": "ec2655d926a9b2662c416608d087fff6",              // 申请好的Web端开发者Key，首次调用 load 时必填
+      "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+      "plugins": ['AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+      "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+        "version": '1.1',   // AMapUI 缺省 1.1
+        "plugins":[],       // 需要加载的 AMapUI ui插件
+      },
+      "Loca":{                // 是否加载 Loca， 缺省不加载
+        "version": '1.3.2'  // Loca 版本，缺省 1.3.2
+      },
+    }).then((AMap)=>{
+      // map = new AMap.Map('container');
+      /*this.geocoder = new AMap.Geocoder({
+        city: "", //城市设为北京，默认：“全国”
+      });*/
+      this.geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true, //是否使用高精度定位，默认:true
+        timeout: 10000, //超过10秒后停止定位，默认：5s
+        // position: 'RB', //定位按钮的停靠位置
+        // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+        // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
+      })
+    }).catch(e => {
+      console.log(e);
+    })
   },
   watch: {
     isPayErr(val, oldVal) {
@@ -543,16 +572,13 @@ export default {
     }
   },
   mounted() {
+    // this.geolocationFn()
     // 电子围栏开关
     // let fence = sessionStorage.getItem('fence')
     this.fence = this.$route.query.fence
-    alert('2fence:'+this.fence)
+    // alert('2fence:'+this.fence)
 
-    if(this.fence == -1){
 
-    }else if(this.fence == 1){
-      this.getLocation();
-    }
     // var x=document.getElementById("demo");
     this.getshowMemberPay()
     // this.weichatLatAndLon()
@@ -569,6 +595,37 @@ export default {
     }
   },
   methods: {
+    //获取坐标转为中文地址
+    geolocationFn(params,payType){
+       let  that = this;
+       let count = 0;
+      this.geolocation.getCurrentPosition((status, result) => {
+        if (status == 'complete') {
+          // this.longitude = result.position.lng
+          // this.latitude = result.position.lat
+          params.longitude = result.position.lng
+          params.latitude = result.position.lat
+          // alert('获取经纬度：'+result.position.lng+'--'+result.position.lat)
+          if(payType === 'member'){
+            this.memberGetWebPay(params);
+          }else if(payType === 'wx'){
+            this.getWebPay(params);
+          }
+
+
+          console.log('获取坐标================',result.position.lng+','+result.position.lat)
+
+          // 应该监听这四个数据 当全部存在时 执行
+          // if(this.oilData.longitude && this.oilData.latitude && this.oilData.phone && this.startGet) {
+          // this.init()
+          // }
+
+        } else {
+          loading.hide();
+          this.$toast.error('定位失败', result.message)
+        }
+      })
+    },
   /*  weichatLatAndLon (callback, error) {
       var that = this;
       var timestamp = new Date().getTime() + "";
@@ -622,7 +679,7 @@ export default {
       });
     },*/
 
-    getLocation() {
+    /*getLocation() {
       alert('开始定位')
       if (navigator.geolocation)
       {
@@ -638,7 +695,7 @@ export default {
     },
     positionError(err) {
       alert('ERROR(' + err.code + '): ' + 'GPS访问被拒绝 或 GPS未开启')
-     /* plus.geolocation.getCurrentPosition(function(p) {
+     /!* plus.geolocation.getCurrentPosition(function(p) {
         //debugCom.log(JSON.stringify(p))
         data.result = true;
         data.position = p;
@@ -668,10 +725,10 @@ export default {
           data.msg = "获取用户位置的请求超时";
         //回调
         callback(data);
-      }*/
+      }*!/
       // console.warn('ERROR(' + err.code + '): ' + err.message);
   // this.errorData = 'ERROR(' + err.code + '): ' + err.message
-},
+},*/
     clearRemark() {
       this.wxRemark = ''
     },
@@ -884,8 +941,8 @@ export default {
         discountPrice: this.discountPrice,
         memberId: this.memberId,
         code: this.code,
-        merchantId: this.merchantId,
-        longitude: this.longitude,
+        merchantId: '',
+        longitude: '',
         latitude: this. latitude,
         fence: this.fence,
         uuid: uuid,
@@ -896,8 +953,19 @@ export default {
         goodsOrderId: this.goodsOrderId,
         hbFqNum: ''
       }
+      if(this.fence == -1){
+
+        this.memberGetWebPay(params)
+      }else if(this.fence == 1){
+        this.geolocationFn(params,'member')
+      }
+
+    },
+    memberGetWebPay(params){
+      let that = this;
       getWebPay(params/*4, this.actualPayment, this.userId, this.storeId, uuid, equipmentId, '', this.md5Str, this.timestramp, this.goodsOrderId, '', this.openId, this.discountPrice, this.memberId, this.code, this.merchantId*/).then(res => {
         console.log(res)
+        loading.hide();
         that.price = res.obj.price
         that.timeStamp = res.obj.timeStamp
         that.orderNumber = res.obj.orderNumber
@@ -922,6 +990,7 @@ export default {
         // 	}	//传参
         // })
       }).catch(err => {
+        loading.hide();
         console.log(err)
       })
     },
@@ -1070,6 +1139,7 @@ export default {
     },
     /* 付款 */
     payment(param) {
+      loading.show();
       // this.testProcess = '进行付款'
       let uuid = initParams(this.$route.query.uuid)
       let equipmentId = initParams(this.$route.query.equipmentId)
@@ -1084,8 +1154,8 @@ export default {
         memberId: param.memberId,
         code: param.code,
         merchantId: param.merchantId,
-        longitude: this.longitude,
-        latitude: this. latitude,
+        longitude: '',
+        latitude: '',
         fence: this.fence,
         uuid: uuid,
         equipmentId: equipmentId,
@@ -1095,8 +1165,25 @@ export default {
         goodsOrderId: param.goodsOrderId,
         hbFqNum: ''
       }
-      alert('params'+params.longitude)
+      if(this.fence == -1){
+        loading.hide();
+        this.getWebPay(params)
+      }else if(this.fence == 1){
+        this.geolocationFn(params,'wx')
+        return
+      }
+      // alert('params'+params.longitude)
+
+      /* 跳转付款成功 */
+      // this.$router.push({
+      // 	path:'/wx/paySuccess',	//地址
+      // 	query:{}	//传参
+      // })
+    },
+    getWebPay(params){
+      // alert('getWebPay经纬度'+params.longitude+'--'+params.latitude)
       getWebPay(params/*1, param.paymentMoney, param.userId, param.storeId, uuid, equipmentId, this.wxRemark, this.md5Str, this.timestramp, param.goodsOrderId, '', param.openId, param.discountPrice, param.memberId, param.code, param.merchantId*/).then(res => {
+        loading.hide();
         // this.testProcess = '付款接口调取成功，进行付款跳转'
         console.log(res)
         this.testRes = JSON.stringify(res)
@@ -1124,16 +1211,13 @@ export default {
         }
 
       }).catch(err => {
+        loading.hide();
         console.log(err)
         // this.testProcess = '付款接口调取失败，尝试获得错误信息'
         // this.testFail = err
       })
-      /* 跳转付款成功 */
-      // this.$router.push({
-      // 	path:'/wx/paySuccess',	//地址
-      // 	query:{}	//传参
-      // })
     },
+
     /* 进行微信官方支付 */
     wxPay(payObj) {
       if (typeof WeixinJSBridge == "undefined") {

@@ -113,10 +113,13 @@
   import iconWeixin from '@/assets/iconimg/icon-weixin.png'
   import iconBank from '@/assets/iconimg/icon-bank.png'
   import keyboard from '@/components/keyboard.vue'
+  import AMapLoader from '@amap/amap-jsapi-loader';
+  import loading from '@/common/loading.js'
 	export default{
     components: {keyboard},
 		data() {
 			return{
+        geolocation:null,
         longitude:'', //经度
         latitude:'', //纬度
         fence:1,
@@ -175,6 +178,7 @@
       }
 			this.payMoney = payMoney
 			this.userId = sessionStorage.getItem('userId')
+      alert('CREATuserid:'+this.userId)
 			let storeId = sessionStorage.getItem('storeId')
 			this.storeId = '';
 			if(storeId != null && storeId != '' && storeId){
@@ -182,12 +186,7 @@
 			}
       // 电子围栏开关
       // let fence = sessionStorage.getItem('fence')
-      this.fence = this.$route.query.fence
-      if(this.fence == -1){
 
-      }else if(this.fence == 1){
-        this.getLocation();
-      }
       // alert('1fence:'+this.fence)
       // 预下单
       let goodsOrderId = sessionStorage.getItem("goodsOrderId")
@@ -215,8 +214,36 @@
 					this.testFail = err
 			})
 			*/
+      AMapLoader.load({
+        "key": "ec2655d926a9b2662c416608d087fff6",              // 申请好的Web端开发者Key，首次调用 load 时必填
+        "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        "plugins": [ 'AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+          "version": '1.1',   // AMapUI 缺省 1.1
+          "plugins":[],       // 需要加载的 AMapUI ui插件
+        },
+        "Loca":{                // 是否加载 Loca， 缺省不加载
+          "version": '1.3.2'  // Loca 版本，缺省 1.3.2
+        },
+      }).then((AMap)=>{
+        // map = new AMap.Map('container');
+        /*this.geocoder = new AMap.Geocoder({
+          city: "", //城市设为北京，默认：“全国”
+        });*/
+        this.geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true, //是否使用高精度定位，默认:true
+          timeout: 10000, //超过10秒后停止定位，默认：5s
+          // position: 'RB', //定位按钮的停靠位置
+          // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+          // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
+        })
+      }).catch(e => {
+        console.log(e);
+      })
 		},
     mounted() {
+      this.fence = this.$route.query.fence
+
       // var x=document.getElementById("demo");
       if (this.payMoney <= 0) {
         // 金额小于等于零的条件下，需要出发键盘
@@ -234,7 +261,31 @@
       */
     },
 		methods:{
-      getLocation() {
+      //获取坐标转为中文地址
+      geolocationFn(params){
+        // var  that = this;
+        this.geolocation.getCurrentPosition((status, result) => {
+          if (status == 'complete') {
+            // this.longitude = result.position.lng
+            // this.latitude = result.position.lat
+            params.longitude = result.position.lng
+            params.latitude = result.position.lat
+            this.getWebPay(params);
+            // alert('获取经纬度：'+result.position.lng+'--'+result.position.lat)
+            console.log('获取坐标================',result.position.lng+','+result.position.lat)
+
+            // 应该监听这四个数据 当全部存在时 执行
+            // if(this.oilData.longitude && this.oilData.latitude && this.oilData.phone && this.startGet) {
+            // this.init()
+            // }
+
+          } else {
+            loading.hide();
+            this.$toast.error('定位失败', result.message)
+          }
+        })
+      },
+      /*getLocation() {
         if (navigator.geolocation)
         {
           navigator.geolocation.getCurrentPosition(this.showPosition,this.positionError);
@@ -247,7 +298,7 @@
       },
       positionError(err) {
         alert('ERROR(' + err.code + '): ' + 'GPS访问被拒绝 或 GPS未开启')
-        /* plus.geolocation.getCurrentPosition(function(p) {
+        /!* plus.geolocation.getCurrentPosition(function(p) {
            //debugCom.log(JSON.stringify(p))
            data.result = true;
            data.position = p;
@@ -277,10 +328,10 @@
              data.msg = "获取用户位置的请求超时";
            //回调
            callback(data);
-         }*/
+         }*!/
         // console.warn('ERROR(' + err.code + '): ' + err.message);
         // this.errorData = 'ERROR(' + err.code + '): ' + err.message
-      },
+      },*/
       /**
        * 获取门店信息
        * */
@@ -437,6 +488,8 @@
       },
 			/* 付款 */
 			payment() {
+			  alert('userid:'+this.userId)
+			  loading.show();
 				this.testProcess = '进行付款'
         let uuid = initParams(this.$route.query.uuid)
         let equipmentId = initParams(this.$route.query.equipmentId)
@@ -460,13 +513,18 @@
           // remarks: '',
           md5Str: this.md5Str,
           timestramp: this.timestramp,
-          goodsOrderId: params.goodsOrderId,
+          goodsOrderId: this.goodsOrderId,
           hbFqNum: this.hbFqNum,
           longitude: this.longitude,
-          latitude: this. latitude,
+          latitude: this.latitude,
           fence: this.fence,
         }
-				getWebPay(2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum).then(res => {
+        if(this.fence == -1){
+          this.getWebPay(params)
+        }else if(this.fence == 1){
+          this.geolocationFn(params)
+        }
+				/*getWebPay(2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum).then(res => {
 					this.testProcess = '付款接口调取成功，进行付款跳转'
 					console.log(res)
 					this.testRes = JSON.stringify(res)
@@ -479,8 +537,29 @@
           this.showMask = false
 					this.testProcess = '付款接口调取失败，尝试获得错误信息'
 					this.testFail = err
-				})
-			}
+				})*/
+			},
+      getWebPay(params){
+        let params1 = JSON.stringify(params)
+        alert('paramsuserid:'+params1)
+        getWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
+
+          loading.hide();
+          this.testProcess = '付款接口调取成功，进行付款跳转'
+          console.log(res)
+          this.testRes = JSON.stringify(res)
+          window.location.href = res.obj.payUrl		//跳转外部链接-支付宝支付链接
+          setTimeout(() => {
+            this.showMask = false
+          }, 500)
+        }).catch(err => {
+          loading.hide();
+          console.log(err)
+          this.showMask = false
+          this.testProcess = '付款接口调取失败，尝试获得错误信息'
+          this.testFail = err
+        })
+      }
 		}
 	}
 </script>
