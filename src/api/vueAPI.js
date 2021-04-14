@@ -108,6 +108,16 @@ export function getMerchantName ( userId, merchantId='') {
 		}
 	})
 }
+// 获取高德秘钥
+export function getGaoDeKey (companyId) {
+  return fly.request({
+    url: '/auth/gaode_map_config',
+    method: 'get',
+    params: {
+      companyId
+    }
+  })
+}
 /* 获取会员卡详情 */
 //参数:商户id:userId
 export function getMerchantMemberCard ( userId, merchantId) {

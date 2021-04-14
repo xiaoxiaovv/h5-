@@ -107,6 +107,8 @@
       </div>
       <div class="paybtns btnsblue mt40 justcenter"
            @click="payConfirmModal"><span>付款 <template v-if="actualPayment !== '0' && actualPayment">{{yenSymbol}}{{actualPayment}}</template></span></div>
+      <!--<div class="paybtns btnsblue mt40 justcenter"
+           @click="onBridgeReady"><span>付款测试1 用这个<template v-if="actualPayment !== '0' && actualPayment">{{yenSymbol}}{{actualPayment}}</template></span></div>-->
       <div class="paybtns justcenter"
            v-if="(!isMember) && showMemberPay"
            @click="jumpAddMember"><span>加入会员</span></div>
@@ -354,6 +356,12 @@
            @click="payConfirmModal">
         <span class="text-weight">付款</span>
       </div>
+
+     <!-- <div class="lf-content-btn lf-content-btn-one margin-0-auto"
+           :style="{width: htmlWidth - 60 * htmlProportion + 'px', height: htmlProportion * 100 + 'px'}"
+           @click="onBridgeReady">
+        <span class="text-weight">付款测试2</span>
+      </div>-->
       <div class="lf-content-btn lf-content-btn-two margin-0-auto"
            v-if="(!isMember) && showMemberPay"
            :style="{width: htmlWidth - 60 * htmlProportion + 'px', height: htmlProportion * 100 + 'px'}"
@@ -372,7 +380,7 @@
 </template>
 
 <script>
-import { getMemberCouponList, getWebPay, getCouponList, showMemberPay, getStoreName } from '../../../api/vueAPI.js'
+import { getMemberCouponList, getWebPay, getCouponList, showMemberPay, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
 // import {getWebPay, getMerchantName} from '../../../api/vueAPI.js'
 import { initParams } from '@/utils/initParams.js'
 import imgBg from '@/assets/iconimg/icon-shop.png'
@@ -388,6 +396,8 @@ export default {
   components: { keyboard },
   data() {
     return {
+      serviceId: '',
+      gdWebSideKey: '',
       geolocation:null,
       errorData:'',
       longitude:'', //经度
@@ -443,6 +453,9 @@ export default {
     }
   },
   created() {
+    this.serviceId = this.$route.query.serviceId;
+    // alert('serviceId:'+this.serviceId)
+
     let equipmentId = initParams(this.$route.query.equipmentId)
     if (equipmentId) {
       this.equipmentId = equipmentId
@@ -456,6 +469,7 @@ export default {
     this.htmlProportion = this.htmlWidth / 750;
     // console.log(this.htmlWidth);
     // console.log(this.htmlheight);
+
     /* 获取openId和memberId信息 */
     let openId = this.$route.query.openId;
     if (openId != null && openId != '' && openId) {
@@ -515,32 +529,8 @@ export default {
     // window.location.href = ''
     this.getMemberCouponList();
     this.getMerchantInfo()
-    AMapLoader.load({
-      "key": "ec2655d926a9b2662c416608d087fff6",              // 申请好的Web端开发者Key，首次调用 load 时必填
-      "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-      "plugins": ['AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
-      "AMapUI": {             // 是否加载 AMapUI，缺省不加载
-        "version": '1.1',   // AMapUI 缺省 1.1
-        "plugins":[],       // 需要加载的 AMapUI ui插件
-      },
-      "Loca":{                // 是否加载 Loca， 缺省不加载
-        "version": '1.3.2'  // Loca 版本，缺省 1.3.2
-      },
-    }).then((AMap)=>{
-      // map = new AMap.Map('container');
-      /*this.geocoder = new AMap.Geocoder({
-        city: "", //城市设为北京，默认：“全国”
-      });*/
-      this.geolocation = new AMap.Geolocation({
-        enableHighAccuracy: true, //是否使用高精度定位，默认:true
-        timeout: 10000, //超过10秒后停止定位，默认：5s
-        // position: 'RB', //定位按钮的停靠位置
-        // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-        // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
-      })
-    }).catch(e => {
-      console.log(e);
-    })
+    this.getGaoDeKey()
+
   },
   watch: {
     isPayErr(val, oldVal) {
@@ -595,6 +585,47 @@ export default {
     }
   },
   methods: {
+    //获取高德秘钥
+    getGaoDeKey(){
+      // alert('获取秘钥开始')
+      getGaoDeKey(this.serviceId).then(res => {
+        // this.gdWebServiceKey = res.obj.gdWebServiceKey;
+        this.gdWebSideKey = res.obj.gdWebSideKey;
+        // alert('gdWebSideKey:'+this.gdWebSideKey)
+        this.initAmap();
+      },err => {
+        alert('警告：'+err.msg)
+      })
+    },
+    initAmap(){
+
+      AMapLoader.load({
+        "key": this.gdWebSideKey,              // 申请好的Web端开发者Key，首次调用 load 时必填
+        "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        "plugins": ['AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+          "version": '1.1',   // AMapUI 缺省 1.1
+          "plugins":[],       // 需要加载的 AMapUI ui插件
+        },
+        "Loca":{                // 是否加载 Loca， 缺省不加载
+          "version": '1.3.2'  // Loca 版本，缺省 1.3.2
+        },
+      }).then((AMap)=>{
+        // map = new AMap.Map('container');
+        /*this.geocoder = new AMap.Geocoder({
+          city: "", //城市设为北京，默认：“全国”
+        });*/
+        this.geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true, //是否使用高精度定位，默认:true
+          timeout: 10000, //超过10秒后停止定位，默认：5s
+          // position: 'RB', //定位按钮的停靠位置
+          // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+          // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
+        })
+      }).catch(e => {
+        console.log(e);
+      })
+    },
     //获取坐标转为中文地址
     geolocationFn(params,payType){
        let  that = this;
@@ -1166,7 +1197,7 @@ export default {
         hbFqNum: ''
       }
       if(this.fence == -1){
-        loading.hide();
+
         this.getWebPay(params)
       }else if(this.fence == 1){
         this.geolocationFn(params,'wx')
@@ -1239,6 +1270,7 @@ export default {
       // this.testProcess = '进行微信唤醒'
       WeixinJSBridge.invoke(
         'getBrandWCPayRequest', {
+
         "appId": payObj.appId,     		//公众号名称，由商户传入
         "timeStamp": payObj.timeStamp,         //时间戳，自1970年以来的秒数
         "nonceStr": payObj.nonceStr, 	//随机串

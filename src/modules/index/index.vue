@@ -144,7 +144,9 @@
           query:{
             uuid: uuid,
             equipmentId: equipmentId,
-            fence: this.$route.query.fence
+            fence: this.$route.query.fence,
+            merchantId: this.$route.query.merchantId,
+            serviceId: this.$route.query.serviceId,
           }	//传参
         })
       } else {

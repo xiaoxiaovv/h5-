@@ -104,7 +104,7 @@
 </template>
 
 <script>
-	import {getWebPay, getMerchantName, getStoreName} from '../../../api/vueAPI.js'
+	import {getWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
   import imgBg from '@/assets/iconimg/icon-shop.png'
   import imgCloseBg from '@/assets/iconimg/icon-close.png'
@@ -119,6 +119,7 @@
     components: {keyboard},
 		data() {
 			return{
+        gdWebSideKey: '',
         geolocation:null,
         longitude:'', //经度
         latitude:'', //纬度
@@ -163,6 +164,9 @@
       }
     },
 		created() {
+      this.serviceId = this.$route.query.serviceId;
+      // alert('serviceId:'+this.serviceId)
+
       let equipmentId = initParams(this.$route.query.equipmentId)
       if (equipmentId) {
         this.equipmentId = equipmentId
@@ -178,12 +182,13 @@
       }
 			this.payMoney = payMoney
 			this.userId = sessionStorage.getItem('userId')
-      alert('CREATuserid:'+this.userId)
+      // alert('CREATuserid:'+this.userId)
 			let storeId = sessionStorage.getItem('storeId')
 			this.storeId = '';
 			if(storeId != null && storeId != '' && storeId){
 				this.storeId = storeId
 			}
+
       // 电子围栏开关
       // let fence = sessionStorage.getItem('fence')
 
@@ -202,6 +207,7 @@
 			this.testProcess = '创建页面'
 			this.testMoney = this.payMoney
       this.getMerchantInfo()
+      this.getGaoDeKey()
       /*
 			getMerchantName(this.userId).then(res => {
 				this.testProcess = '商家信息调取成功'
@@ -214,36 +220,13 @@
 					this.testFail = err
 			})
 			*/
-      AMapLoader.load({
-        "key": "ec2655d926a9b2662c416608d087fff6",              // 申请好的Web端开发者Key，首次调用 load 时必填
-        "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        "plugins": [ 'AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
-        "AMapUI": {             // 是否加载 AMapUI，缺省不加载
-          "version": '1.1',   // AMapUI 缺省 1.1
-          "plugins":[],       // 需要加载的 AMapUI ui插件
-        },
-        "Loca":{                // 是否加载 Loca， 缺省不加载
-          "version": '1.3.2'  // Loca 版本，缺省 1.3.2
-        },
-      }).then((AMap)=>{
-        // map = new AMap.Map('container');
-        /*this.geocoder = new AMap.Geocoder({
-          city: "", //城市设为北京，默认：“全国”
-        });*/
-        this.geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true, //是否使用高精度定位，默认:true
-          timeout: 10000, //超过10秒后停止定位，默认：5s
-          // position: 'RB', //定位按钮的停靠位置
-          // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-          // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
-        })
-      }).catch(e => {
-        console.log(e);
-      })
+
 		},
     mounted() {
       this.fence = this.$route.query.fence
-
+      this.merchantId = this.$route.query.merchantId
+      let routerStr = JSON.stringify(this.$route.query)
+      // alert('routerStr:'+routerStr)
       // var x=document.getElementById("demo");
       if (this.payMoney <= 0) {
         // 金额小于等于零的条件下，需要出发键盘
@@ -261,6 +244,48 @@
       */
     },
 		methods:{
+      //获取高德秘钥
+      getGaoDeKey(){
+        // alert('开始获取秘钥')
+        getGaoDeKey(this.serviceId).then(res => {
+          // this.gdWebServiceKey = res.obj.gdWebServiceKey;
+          this.gdWebSideKey = res.obj.gdWebSideKey;
+          // alert('gdWebSideKey:'+this.gdWebSideKey)
+          this.initAmap()
+        },err => {
+          alert('警告：'+err.msg)
+
+        })
+      },
+      initAmap(){
+
+        AMapLoader.load({
+          "key": this.gdWebSideKey,              // 申请好的Web端开发者Key，首次调用 load 时必填
+          "version": "1.4.15",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+          "plugins": [ 'AMap.Geolocation'],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+          "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+            "version": '1.1',   // AMapUI 缺省 1.1
+            "plugins":[],       // 需要加载的 AMapUI ui插件
+          },
+          "Loca":{                // 是否加载 Loca， 缺省不加载
+            "version": '1.3.2'  // Loca 版本，缺省 1.3.2
+          },
+        }).then((AMap)=>{
+          // map = new AMap.Map('container');
+          /*this.geocoder = new AMap.Geocoder({
+            city: "", //城市设为北京，默认：“全国”
+          });*/
+          this.geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true, //是否使用高精度定位，默认:true
+            timeout: 10000, //超过10秒后停止定位，默认：5s
+            // position: 'RB', //定位按钮的停靠位置
+            // buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            // zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
+          })
+        }).catch(e => {
+          console.log(e);
+        })
+      },
       //获取坐标转为中文地址
       geolocationFn(params){
         // var  that = this;
@@ -488,7 +513,7 @@
       },
 			/* 付款 */
 			payment() {
-			  alert('userid:'+this.userId)
+			  // alert('userid:'+this.userId)
 			  loading.show();
 				this.testProcess = '进行付款'
         let uuid = initParams(this.$route.query.uuid)
@@ -496,6 +521,7 @@
         this.showMask = true
         let  md5Str = sessionStorage.getItem('md5Str')
         let  timestramp = sessionStorage.getItem('timestramp')
+        // alert('merchantId:'+this.merchantId)
         let params = {
           scanAppType: 2, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
           payWay: 2,
@@ -506,7 +532,7 @@
           // discountPrice: this.discountPrice,
           // memberId: this.memberId,
           // code: this.code,
-          // merchantId: this.merchantId,
+          merchantId: this.merchantId,
 
           uuid: uuid,
           equipmentId: equipmentId,
@@ -541,7 +567,7 @@
 			},
       getWebPay(params){
         let params1 = JSON.stringify(params)
-        alert('paramsuserid:'+params1)
+        // alert('提交params:'+params1)
         getWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
 
           loading.hide();
