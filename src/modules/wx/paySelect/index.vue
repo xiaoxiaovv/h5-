@@ -529,7 +529,10 @@ export default {
     // window.location.href = ''
     this.getMemberCouponList();
     this.getMerchantInfo()
-    this.getGaoDeKey()
+  if(this.fence == 1){
+      //电子围栏开，获取定位信息
+      this.getGaoDeKey()
+    }
 
   },
   watch: {

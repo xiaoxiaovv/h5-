@@ -207,7 +207,12 @@
 			this.testProcess = '创建页面'
 			this.testMoney = this.payMoney
       this.getMerchantInfo()
-      this.getGaoDeKey()
+      this.fence = this.$route.query.fence
+      if(this.fence == 1){
+        //电子围栏开，获取定位信息
+        this.getGaoDeKey()
+      }
+
       /*
 			getMerchantName(this.userId).then(res => {
 				this.testProcess = '商家信息调取成功'
@@ -546,9 +551,14 @@
           fence: this.fence,
         }
         if(this.fence == -1){
+          // 电子围栏关，直接下单
           this.getWebPay(params)
         }else if(this.fence == 1){
+          //电子围栏开，获取定位信息
           this.geolocationFn(params)
+        }else{
+          //没有开关的系统访问该页面都放行，直接下单
+          this.getWebPay(params)
         }
 				/*getWebPay(2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum).then(res => {
 					this.testProcess = '付款接口调取成功，进行付款跳转'
