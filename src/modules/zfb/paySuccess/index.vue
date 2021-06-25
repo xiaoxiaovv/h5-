@@ -102,7 +102,7 @@
     </div>
   </div>
 </template>
-
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
 <script>
 	import {getWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
@@ -165,8 +165,8 @@
     },
 		created() {
       this.serviceId = this.$route.query.serviceId;
+      this.merchantId = this.$route.query.merchantId
       // alert('serviceId:'+this.serviceId)
-
       let equipmentId = initParams(this.$route.query.equipmentId)
       if (equipmentId) {
         this.equipmentId = equipmentId
@@ -225,11 +225,16 @@
 					this.testFail = err
 			})
 			*/
+      let openId = this.$route.query.openId
+      if(!openId){
+        this.handleLogin();   //如果没有id才会调取授权页
+      }
 
 		},
     mounted() {
       this.fence = this.$route.query.fence
       this.merchantId = this.$route.query.merchantId
+
       let routerStr = JSON.stringify(this.$route.query)
       // alert('routerStr:'+routerStr)
       // var x=document.getElementById("demo");
@@ -249,6 +254,23 @@
       */
     },
 		methods:{
+      handleLogin() {
+        // alert(this.merchantId+","+this.serviceId)
+        window.location.href = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_base &redirect_uri=https%3A%2F%2Fmamipay.com%2Forder%2Fcallback%2Fali_oauth&merchantId="+this.merchantId+"&serviceId="+this.serviceId
+
+        // getZFBINfo().then((res) => {
+
+
+          //   //backUrl是授权返回页（去后台调支付宝接口获取token和user_id,然后进行用户验证和其他逻辑处理）
+          //   const backUrl = encodeURIComponent(res.backUrl)
+          //   //url是跳转到支付宝登录页面，然后他会跳转到redirect_uri
+          //   const url = res.url + '&scope=auth_base&redirect_uri='+backUrl
+          //   window.location.href = url
+          // }).catch((res) => {
+          //   console.log('error', res)
+          // })
+        // }
+      },
       //获取高德秘钥
       getGaoDeKey(){
         // alert('开始获取秘钥')
@@ -527,6 +549,7 @@
         let  md5Str = sessionStorage.getItem('md5Str')
         let  timestramp = sessionStorage.getItem('timestramp')
         // alert('merchantId:'+this.merchantId)
+        let openId = this.$route.query.openId
         let params = {
           scanAppType: 2, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
           payWay: 2,
@@ -541,6 +564,7 @@
 
           uuid: uuid,
           equipmentId: equipmentId,
+          openId:openId, // 敏付重定向返回的
           // remarks: '',
           md5Str: this.md5Str,
           timestramp: this.timestramp,
@@ -584,7 +608,35 @@
           this.testProcess = '付款接口调取成功，进行付款跳转'
           console.log(res)
           this.testRes = JSON.stringify(res)
-          window.location.href = res.obj.payUrl		//跳转外部链接-支付宝支付链接
+          if(res.obj.channel == 13){
+            // alert(JSON.stringify(window.AlipayJSBridge))
+            // window.tradePay(res.obj.tradeNO);
+
+              // 通过传入交易号唤起快捷调用方式(注意tradeNO大小写严格)
+            // alert('res.obj.tradeNO:'+JSON.stringify(res))
+              window.AlipayJSBridge.call("tradePay", {
+                tradeNO: res.obj.tradeNO
+              }, function (data) {
+                // alert(JSON.stringify(data));
+                if(data.resultCode!=9000){
+                  //支付失败
+                  // alert(data.resultCode+"："+data.memo);
+                  this.showMask = false
+                  this.testProcess = '付款接口调取失败，尝试获得错误信息'
+                  this.testFail = data.resultCode+"："+data.memo
+                }else{
+                  // alert(1)
+                  // alert(data.resultCode+"："+data.memo);
+                  window.AlipayJSBridge.call('closeWebview')     //支付成功后关闭第三方链接   回到支付宝页面
+                }
+              });
+
+
+
+          }else{
+            window.location.href = res.obj.payUrl		//跳转外部链接-支付宝支付链接
+          }
+
           setTimeout(() => {
             this.showMask = false
           }, 500)
@@ -600,12 +652,15 @@
 	}
 </script>
 
+
+
+
 <style>
   .payprice-tipred {
     position: absolute;
     bottom: 0;
     right: 0.8rem;
-    color: red;
+    color: #ff0000;
     font-size: 0.373rem;
   }
 

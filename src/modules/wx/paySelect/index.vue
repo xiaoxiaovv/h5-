@@ -438,6 +438,7 @@ export default {
       memberMoney: '',
       memberId: '',
       openId: '',
+      appId: '',
       userId: '',
       storeId: '',
       discountPrice: '',
@@ -478,6 +479,10 @@ export default {
     let memberId = this.$route.query.memberId;
     if (memberId != null && memberId != '' && memberId != 'null' && memberId) {
       this.memberId = memberId
+    }
+    let appId = this.$route.query.appId;
+    if (appId != null && appId != '' && appId != 'null' && appId) {
+      this.appId = appId
     }
 
     let goodsOrderId = sessionStorage.getItem("goodsOrderId")
@@ -829,7 +834,7 @@ export default {
       /* 加入会员 */
       this.$router.push({
         path: '/wx/memberCard',
-        query: { openId: this.openId, merchantId: this.merchantId }	//传参
+        query: { openId: this.openId, merchantId: this.merchantId, appId: this.appId }	//传参
       })
     },
     /**
@@ -909,11 +914,12 @@ export default {
     paymentJump() {
       /* 付款 */
       //确认付款
+
+
       if (this.paymentMoney.trim().match(/^[0-9]+([.]{1}[0-9]{1,2})?$/)) {
         console.log("付款判断")
         //会员储值卡支付
         if (this.isMemberRadio && this.isMember) {
-          console.log("会员储值卡付款判断")
           if (this.memberMoney >= this.actualPayment) {
             this.memberPayment()
           } else {
@@ -922,10 +928,11 @@ export default {
           return
         }
         console.log("进入微信支付-即将跳转微信支付页")
-        console.log(this.payMoney, this.discountPrice, this.openId, this.userId, this.storeId, this.memberId, this.code, this.merchantId)
+        console.log(this.payMoney, this.discountPrice, this.openId, this.userId, this.storeId, this.memberId, this.code, this.merchantId,this.appId)
         //跳转微信支付页
         let params = {
           paymentMoney: this.actualPayment,
+          appId:this.appId,
           openId: this.openId,
           userId: this.userId,
           storeId: this.storeId,
@@ -955,6 +962,7 @@ export default {
         })
         */
       } else {
+        console.log('支付End')
         this.isPayErr = true;
       }
     },
@@ -971,6 +979,7 @@ export default {
         totalPrice: this.actualPayment,
         userId: this.userId,
         openId: this.openId,
+        appId:this.appId,
         storeId: this.storeId,
         discountPrice: this.discountPrice,
         memberId: this.memberId,
@@ -1160,7 +1169,6 @@ export default {
     /* 计算还需支付金额 */
     doActualPayment() {
       this.actualPayment = this.paymentMoney
-      console.log(22222222)
       if (this.isSelectCoupon) {
         this.actualPayment = (this.actualPayment - this.isSelectCoupon.money).toFixed(2)
       }
@@ -1183,6 +1191,7 @@ export default {
         totalPrice: param.paymentMoney,
         userId: param.userId,
         openId: param.openId,
+        appId:param.appId,
         storeId: param.storeId,
         discountPrice: param.discountPrice,
         memberId: param.memberId,
@@ -1200,7 +1209,6 @@ export default {
         hbFqNum: ''
       }
       if(this.fence == -1){
-
         this.getWebPay(params)
       }else if(this.fence == 1){
         this.geolocationFn(params,'wx')
@@ -1238,16 +1246,25 @@ export default {
           case 6:		/* 第三方支付-富友 */
           case 7:		/* 第三方支付-随行付 */
           case 9:		/* 第三方支付-银盛 */
+
           case 19:		/* 第三方支付-开店宝 */
             // this.testProcess = '进行第三方支付'
             window.location.href = res.obj.payUrl		//跳转外部链接
             break
+          case 21:  /* 第三方支付-敏付 */
+            this.wxPay(res.obj.jsPayResponse);
+            this.price = res.obj.jsPayResponse.price
+            this.timeStamp = res.obj.jsPayResponse.timeStamp
+            this.orderNumber = res.obj.jsPayResponse.orderNumber
+            break
+
+
         }
 
       }).catch(err => {
         loading.hide();
         console.log(err)
-        // this.testProcess = '付款接口调取失败，尝试获得错误信息'
+        //this.testProcess = '付款接口调取失败，尝试获得错误信息'
         // this.testFail = err
       })
     },
@@ -1255,6 +1272,7 @@ export default {
     /* 进行微信官方支付 */
     wxPay(payObj) {
       if (typeof WeixinJSBridge == "undefined") {
+          console.log(document.addEventListener);
         if (document.addEventListener) {
           document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
         } else if (document.attachEvent) {
