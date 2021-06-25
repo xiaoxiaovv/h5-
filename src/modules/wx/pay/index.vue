@@ -134,6 +134,7 @@
           totalPrice: this.payMoney,
           userId: this.userId,
           openId: this.openId,
+          appId: this.appId,
           storeId: this.storeId,
           discountPrice: this.discountPrice,
           memberId: this.memberId,
@@ -166,6 +167,14 @@
 							// this.testProcess = '进行第三方支付'
 							window.location.href = res.obj.payUrl		//跳转外部链接
 							break
+            case 21:		/* 微信官方支付 */
+              // this.testProcess = '进行官方支付'
+              this.wxPay(res.obj.jsPayResponse);
+              this.price = res.obj.jsPayResponse.price
+              this.timeStamp = res.obj.jsPayResponse.timeStamp
+              this.orderNumber = res.obj.jsPayResponse.orderNumber
+              break     /* 第三方支付-敏付 */
+
 					}
 
 				}).catch(err => {
