@@ -1214,6 +1214,7 @@ export default {
         this.geolocationFn(params,'wx')
         return
       }
+      
       // alert('params'+params.longitude)
 
       /* 跳转付款成功 */
