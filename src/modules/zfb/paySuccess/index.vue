@@ -608,7 +608,7 @@
           this.testProcess = '付款接口调取成功，进行付款跳转'
           console.log(res)
           this.testRes = JSON.stringify(res)
-          if(res.obj.channel == 13){
+          if(res.obj.channel == 21){
             // alert(JSON.stringify(window.AlipayJSBridge))
             // window.tradePay(res.obj.tradeNO);
 
