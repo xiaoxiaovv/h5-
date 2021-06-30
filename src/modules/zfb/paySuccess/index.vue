@@ -115,6 +115,7 @@
   import keyboard from '@/components/keyboard.vue'
   import AMapLoader from '@amap/amap-jsapi-loader';
   import loading from '@/common/loading.js'
+
 	export default{
     components: {keyboard},
 		data() {
@@ -161,12 +162,20 @@
     watch: {
       payMoney(val,oldVal){
         this.checkInputPrice(val, true)
+
       }
     },
-		created() {
+
+		created() {//
+     // console.log("确认这个页面")
+      //let urls = this.$route.query;
+     // alert(JSON.stringify(urls))
       this.serviceId = this.$route.query.serviceId;
-      this.merchantId = this.$route.query.merchantId
-      // alert('serviceId:'+this.serviceId)
+      this.merchantId = this.$route.query.merchantId;
+
+
+
+
       let equipmentId = initParams(this.$route.query.equipmentId)
       if (equipmentId) {
         this.equipmentId = equipmentId
@@ -225,15 +234,23 @@
 					this.testFail = err
 			})
 			*/
-      let openId = this.$route.query.openId
-      if(!openId){
-        this.handleLogin();   //如果没有id才会调取授权页
-      }
+
+      // let openId = this.$route.query.openId;
+      //
+      // if(!openId){
+      //   this.handleLogin();   //如果没有id才会调取授权页
+      // }
+
+
+
 
 		},
+
     mounted() {
       this.fence = this.$route.query.fence
       this.merchantId = this.$route.query.merchantId
+
+
 
       let routerStr = JSON.stringify(this.$route.query)
       // alert('routerStr:'+routerStr)
@@ -253,24 +270,21 @@
       this.numberPercent(eles)
       */
     },
+
 		methods:{
-      handleLogin() {
-        // alert(this.merchantId+","+this.serviceId)
-        window.location.href = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_base &redirect_uri=https%3A%2F%2Fmamipay.com%2Forder%2Fcallback%2Fali_oauth&merchantId="+this.merchantId+"&serviceId="+this.serviceId
 
-        // getZFBINfo().then((res) => {
-
-
-          //   //backUrl是授权返回页（去后台调支付宝接口获取token和user_id,然后进行用户验证和其他逻辑处理）
-          //   const backUrl = encodeURIComponent(res.backUrl)
-          //   //url是跳转到支付宝登录页面，然后他会跳转到redirect_uri
-          //   const url = res.url + '&scope=auth_base&redirect_uri='+backUrl
-          //   window.location.href = url
-          // }).catch((res) => {
-          //   console.log('error', res)
-          // })
-        // }
-      },
+      // handleLogin() {
+      //   // alert(this.merchantId+","+this.serviceId)
+      //   this.serviceId = this.$route.query.serviceId;
+      //   this.AppId = this.$route.query.aliAppId;
+      //   alert(this.$route.query.aliAppId);
+      // //indow.location.href = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_base &redirect_uri=https%3A%2F%2Fmamipay.com%2Forder%2Fcallback%2Fali_oauth&merchantId="+this.merchantId+"&serviceId="+this.serviceId
+      //   let u = 'https://mamipay.com/order/callback/ali_oauth';
+      //   let bankURL = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_userinfo&redirect_uri='+escape(u)+"&merchantId="+this.merchantId+"&serviceId="+this.serviceId;
+      //   window.location.href = bankURL;
+      //   //
+      //
+      // },
       //获取高德秘钥
       getGaoDeKey(){
         // alert('开始获取秘钥')
@@ -284,6 +298,7 @@
 
         })
       },
+
       initAmap(){
 
         AMapLoader.load({
@@ -550,6 +565,7 @@
         let  timestramp = sessionStorage.getItem('timestramp')
         // alert('merchantId:'+this.merchantId)
         let openId = this.$route.query.openId
+
         let params = {
           scanAppType: 2, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
           payWay: 2,
@@ -561,6 +577,7 @@
           // memberId: this.memberId,
           // code: this.code,
           merchantId: this.merchantId,
+
 
           uuid: uuid,
           equipmentId: equipmentId,
@@ -574,6 +591,7 @@
           latitude: this.latitude,
           fence: this.fence,
         }
+
         if(this.fence == -1){
           // 电子围栏关，直接下单
           this.getWebPay(params)
@@ -599,6 +617,7 @@
 					this.testFail = err
 				})*/
 			},
+
       getWebPay(params){
         let params1 = JSON.stringify(params)
         // alert('提交params:'+params1)
@@ -608,7 +627,6 @@
           this.testProcess = '付款接口调取成功，进行付款跳转'
           console.log(res)
           this.testRes = JSON.stringify(res)
-
           if(res.obj.channel == 21){
             // alert(JSON.stringify(window.AlipayJSBridge))
             // window.tradePay(res.obj.tradeNO);

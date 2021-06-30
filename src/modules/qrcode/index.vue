@@ -6,6 +6,7 @@
 </template>
 
 <script>
+
 	import { wxLogin, scanBlankQRcode, baseURL} from '../../api/vueAPI.js'
 	export default {
 		data() {
@@ -17,8 +18,10 @@
 				userId: '',
 				totalPrice: '',
 				blankQrCodeId: '',
+        aliAppId:'',
 			};
 		},
+
 		created() {
 			console.log("created-qrcode")
 			// this.testText = ( ua.match(/MicroMessenger/i) == 'micromessenger' )? '微信':'非微信';
@@ -68,9 +71,15 @@
 			}).catch(err => {
 				console.log(err)
 			})
-		},
-		methods:{
 
+		},
+    methods:{
+      GetQueryString(name)
+      {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return  unescape(r[2]); return null;
+      }
 		}
 	}
 </script>

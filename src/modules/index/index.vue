@@ -15,6 +15,9 @@
 </template>
 
 <script>
+
+</script>
+<script>
 	import { wxLogin, baseURL, getDocmentTitle, wxLoginH5} from '../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
   import MessageBox from 'muse-ui-message'
@@ -29,7 +32,9 @@
 				userId: '',
 				totalPrice: '',
         settimeObj: null,
-        reloadTime: 0
+        reloadTime: 0,
+       // newsAppid:'2021001188664459'
+       // mainurl:'',
 			};
 		},
 		created() {
@@ -60,6 +65,7 @@
       } else {
         sessionStorage.removeItem('fence')
       }*/
+
       let userId = this.$route.query.userId;
       if(userId != null && userId != '' && userId != 'null' && userId){
         sessionStorage.setItem('userId',userId)
@@ -137,6 +143,13 @@
         this.turnToLogin(this.reloadTime + 1)
       } else if (ua.match(/AlipayClient/i) == 'alipayclient'){
         // alert('zhifubaofence '+this.$route.query.fence)
+        // this.getURL();
+        let openId = this.$route.query.openId;
+        let appId = this.$route.query.aliAppId;
+
+        if(!openId){
+          this.handleLogin();   //如果没有id才会调取授权页
+        }
         let uuid = initParams(this.$route.query.uuid)
         let equipmentId = initParams(this.$route.query.equipmentId)
         this.$router.push({
@@ -154,7 +167,36 @@
         this.tip = '请用对应程序进行扫码';
       }
     },
+
 		methods:{
+
+
+
+      handleLogin() {
+        // alert(this.merchantId+","+this.serviceId)
+        this.serviceId = this.$route.query.serviceId;
+        this.merchantId = this.$route.query.merchantId;
+        //this.AppId = this.$route.query.aliAppId;
+       // let app_id  = this.$data.newsAppid;
+        let app_id  = this.$route.query.aliAppId;
+        //indow.location.href = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_base &redirect_uri=https%3A%2F%2Fmamipay.com%2Forder%2Fcallback%2Fali_oauth&merchantId="+this.merchantId+"&serviceId="+this.serviceId
+        let u = baseURL;
+        let bankURL = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id='+app_id+'&scope=auth_userinfo&redirect_uri='+escape(u+"/order/callback/ali_oauth")+"&merchantId="+this.merchantId+"&serviceId="+this.serviceId;
+        window.location.href = bankURL;
+        //
+        // getZFBINfo().then((res) => {
+
+
+        //   //backUrl是授权返回页（去后台调支付宝接口获取token和user_id,然后进行用户验证和其他逻辑处理）
+        //   const backUrl = encodeURIComponent(res.backUrl)
+        //   //url是跳转到支付宝登录页面，然后他会跳转到redirect_uri
+        //   const url = res.url + '&scope=auth_base&redirect_uri='+backUrl
+        //   window.location.href = url
+        // }).catch((res) => {
+        //   console.log('error', res)
+        // })
+        // }
+      },
 			/* 对应页面跳转 */
 			jump(url) {
 				this.$router.push({

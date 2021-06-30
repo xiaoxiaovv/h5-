@@ -234,5 +234,14 @@ export function getStoreName (params) {
   })
 }
 
+/* 获取AppID*/
+// export function getAppID () {
+//   return fly.request({
+//     url : '/pay/pay_config/find_top_pay_config',
+//     method: 'get',
+//     params: {
+//     }
+//   })
+// }
 
 
