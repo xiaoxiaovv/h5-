@@ -181,7 +181,7 @@
         let app_id  = this.$route.query.aliAppId;
         //indow.location.href = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2021001188664459&scope=auth_base &redirect_uri=https%3A%2F%2Fmamipay.com%2Forder%2Fcallback%2Fali_oauth&merchantId="+this.merchantId+"&serviceId="+this.serviceId
         let u = baseURL;
-        let bankURL = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id='+app_id+'&scope=auth_userinfo&redirect_uri='+escape(u+"/order/callback/ali_oauth")+"&merchantId="+this.merchantId+"&serviceId="+this.serviceId;
+        let bankURL = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id='+app_id+'&scope=auth_base&redirect_uri='+escape(u+"/order/callback/ali_oauth")+"&merchantId="+this.merchantId+"&serviceId="+this.serviceId;
         window.location.href = bankURL;
         //
         // getZFBINfo().then((res) => {
