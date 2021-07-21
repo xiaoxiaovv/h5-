@@ -439,7 +439,6 @@
 					this.testProcess = '付款接口调取成功，进行付款跳转'
 					console.log(res)
 					this.testRes = JSON.stringify(res)
-          // alert(res.obj.payUrl)
 					window.location.href = res.obj.payUrl		//跳转外部链接-银联支付链接
           setTimeout(() => {
             this.showMask = false
