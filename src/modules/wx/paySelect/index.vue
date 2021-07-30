@@ -1060,6 +1060,9 @@ export default {
           case 6:		/* 第三方支付-富友 */
           case 7:		/* 第三方支付-随行付 */
           case 9:		/* 第三方支付-银盛 */
+          case 16:		/* 第三方支付-拉卡拉 */
+            window.location.href = res.obj.payUrl		//跳转外部链接
+            break
           case 19:		/* 第三方支付-开店宝 */
             // this.testProcess = '进行第三方支付'
             window.location.href = res.obj.payUrl		//跳转外部链接
