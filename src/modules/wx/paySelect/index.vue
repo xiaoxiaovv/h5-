@@ -1061,7 +1061,13 @@ export default {
           case 7:		/* 第三方支付-随行付 */
           case 9:		/* 第三方支付-银盛 */
           case 16:		/* 第三方支付-拉卡拉 */
-            window.location.href = res.obj.payUrl		//跳转外部链接
+            // window.location.href = res.obj.payUrl		//跳转外部链接
+            // break
+            // this.testProcess = '进行官方支付'
+            this.wxPay(res.obj.jsPayResponse);
+            this.price = res.obj.jsPayResponse.price
+            this.timeStamp = res.obj.jsPayResponse.timeStamp
+            this.orderNumber = res.obj.jsPayResponse.orderNumber
             break
           case 19:		/* 第三方支付-开店宝 */
             // this.testProcess = '进行第三方支付'
