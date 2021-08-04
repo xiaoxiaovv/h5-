@@ -71,6 +71,11 @@ const router =  new Router({
       name: 'advertisement',
       component: () => import('@/modules/advertisement')
     },
+    {
+      path: '/yl/paySuccess',
+      name: 'yl',
+      component: () => import('@/modules/yl/paySuccess')
+    },
   ]
 })
 

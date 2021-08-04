@@ -163,6 +163,15 @@
 							break
 						case 2:		/* 第三方支付-会员宝 */
 						case 3:		/* 第三方支付-易融码 */
+            case 16:  //拉卡拉
+              // window.location.href = res.obj.payUrl		//跳转外部链接
+              // break
+              // this.testProcess = '进行官方支付'
+              this.wxPay(res.obj.jsPayResponse);
+              this.price = res.obj.jsPayResponse.price
+              this.timeStamp = res.obj.jsPayResponse.timeStamp
+              this.orderNumber = res.obj.jsPayResponse.orderNumber
+              break
             case 19:		/* 第三方支付-开店宝 */
 							// this.testProcess = '进行第三方支付'
 							window.location.href = res.obj.payUrl		//跳转外部链接

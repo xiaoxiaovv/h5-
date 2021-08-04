@@ -4,6 +4,7 @@
 			<button class="weui_btn primary" @click="jump('/zfb/paySuccess')">支付宝</button>
 			<button class="weui_btn primary" @click="jump('/wx/paySelect')">微信</button>
 			<button class="weui_btn primary" @click="jump('/qrcode')">二维码</button>
+      <button class="weui_btn primary" @click="jump('/yl/paySuccess')">银联云闪付</button>
 		</div>
 		<div class="test">
 			<p>当前进程: {{testText}}</p>
@@ -163,8 +164,19 @@
           }	//传参
         })
       } else {
-        this.testText = '请用对应程序进行扫码';
-        this.tip = '请用对应程序进行扫码';
+        // 就在这里处理数据吧。
+        // window.location.href = "https://baidu.com" // 跳转外部链接
+        let d =  initParams(this.$route.query)//获取页面携带的参数集合
+        this.$router.push({
+          path:'/yl/paySuccess',
+          query:{
+            uuid: d.uuid,
+            equipmentId: d.equipmentId
+          }	//传参
+        })
+        
+        // this.testText = '请用对应程序进行扫码';
+        // this.tip = '请用对应程序进行扫码';
       }
     },
 
