@@ -444,8 +444,27 @@
         this.showMask = true
         let md5Str = sessionStorage.getItem('md5Str')
         let timestramp = sessionStorage.getItem('timestramp')
-        getWebPay(9, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this
-          .goodsOrderId, this.hbFqNum).then(res => {
+        let params = {
+          scanAppType: 3, //转换坐标用("浏览器类型 1:微信2:支付宝3:云闪付")
+          payWay: 9,
+          totalPrice: this.payMoney,
+          userId: this.userId,
+          storeId: this.storeId,
+          merchantId: this.merchantId,
+          uuid: uuid,
+          equipmentId: equipmentId,
+          remarks: this.remark,
+          md5Str: this.md5Str,
+          timestramp: this.timestramp,
+          goodsOrderId: this.goodsOrderId,
+          hbFqNum: this.hbFqNum,
+          longitude: this.longitude,
+          latitude: this.latitude,
+          fence: this.fence,
+        }
+        getWebPay(params).then(res => {
+        // getWebPay(9, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this
+        //   .goodsOrderId, this.hbFqNum).then(res => {
           this.testProcess = '付款接口调取成功，进行付款跳转'
           console.log(res)
           this.testRes = JSON.stringify(res)

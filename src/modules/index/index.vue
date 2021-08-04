@@ -171,10 +171,13 @@
           path:'/yl/paySuccess',
           query:{
             uuid: d.uuid,
-            equipmentId: d.equipmentId
+            equipmentId: d.equipmentId,
+            fence: d.fence,
+            merchantId: d.merchantId,
+            serviceId: d.serviceId,
           }	//传参
         })
-        
+
         // this.testText = '请用对应程序进行扫码';
         // this.tip = '请用对应程序进行扫码';
       }
