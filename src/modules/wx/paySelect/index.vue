@@ -825,7 +825,7 @@ export default {
           this.isMemberRadio = false
           this.isMember = false
         } else {
-          this.isMemberRadio = true
+          this.isMemberRadio = false
         }
       })
     },
@@ -1233,6 +1233,12 @@ export default {
         switch (parseInt(res.obj.channel)) {
           case 1:		/* 微信官方支付 */
           case 11:		/* 第三方支付-传化 */
+            // this.testProcess = '进行官方支付'
+            this.wxPay(res.obj.jsPayResponse);
+            this.price = res.obj.jsPayResponse.price
+            this.timeStamp = res.obj.jsPayResponse.timeStamp
+            this.orderNumber = res.obj.jsPayResponse.orderNumber
+            break
           case 12:		/* 第三方支付-天阙 */
             // this.testProcess = '进行第三方支付'
             window.location.href = res.obj.payUrl		//跳转外部链接
