@@ -216,7 +216,9 @@
 			this.testProcess = '创建页面'
 			this.testMoney = this.payMoney
       this.getMerchantInfo()
-      this.fence = this.$route.query.fence
+      if(this.$route.query.fence && this.$route.query.fence!=undefined && this.$route.query.fence!='undefined'){//如果存在
+        this.fence = this.$route.query.fence
+      }
       if(this.fence == 1){
         //电子围栏开，获取定位信息
         this.getGaoDeKey()
@@ -247,7 +249,9 @@
 		},
 
     mounted() {
-      this.fence = this.$route.query.fence
+      if(this.$route.query.fence && this.$route.query.fence!=undefined && this.$route.query.fence!='undefined'){//如果存在
+        this.fence = this.$route.query.fence
+      }
       this.merchantId = this.$route.query.merchantId
 
 
