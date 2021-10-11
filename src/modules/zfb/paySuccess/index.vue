@@ -104,7 +104,7 @@
 </template>
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
 <script>
-	import {getWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
+	import {getWebPay, getMarketWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
   import imgBg from '@/assets/iconimg/icon-shop.png'
   import imgCloseBg from '@/assets/iconimg/icon-close.png'
@@ -197,10 +197,14 @@
 			if(storeId != null && storeId != '' && storeId){
 				this.storeId = storeId
 			}
-
+      //
+      // let params = {
+      //    merchantId: this.merchantId,
+      //    userId: this.$route.query.openId//支付宝userId
+      // }
+      // getVoucher(params).then(res => {}, err => {})
       // 电子围栏开关
       // let fence = sessionStorage.getItem('fence')
-
       // alert('1fence:'+this.fence)
       // 预下单
       let goodsOrderId = sessionStorage.getItem("goodsOrderId")
@@ -625,7 +629,7 @@
       getWebPay(params){
         let params1 = JSON.stringify(params)
         // alert('提交params:'+params1)
-        getWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
+        getMarketWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
 
           loading.hide();
           this.testProcess = '付款接口调取成功，进行付款跳转'

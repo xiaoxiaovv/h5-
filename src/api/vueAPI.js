@@ -37,7 +37,31 @@ export function getWebPay (params/*payWay, totalPrice, userId='', storeId='', uu
 		method: 'post',
 	})
 }
-
+/* 网页支付 */
+export function getMarketWebPay (params/*payWay, totalPrice, userId='', storeId='', uuid = '', equipmentId = '', remarks = '',md5Str = '',timestramp = '', goodsOrderId = '', hbFqNum = '', openId = '', discountPrice='', memberId='', code='', merchantId = '',fence='-1'*/) {
+	return fly.request( '/merchant/order/web_pay', qs.stringify(params/*{
+		payWay,
+		totalPrice,
+		userId,
+		openId,
+		storeId,
+		discountPrice,
+		memberId,
+		code,
+		merchantId,
+    fence,
+    uuid,
+    equipmentId,
+    remarks,
+    md5Str,
+    timestramp,
+    goodsOrderId,
+    hbFqNum
+    // kdbGcs:'114.515622|37.080864'
+	}*/),{
+		method: 'post',
+	})
+}
 /* 获取订单列表 */
 export function getOrderList ( pageNumber, pageSize, start_payTime, end_payTime, payWay, status) {
 	return fly.request({
@@ -234,6 +258,24 @@ export function getStoreName (params) {
   })
 }
 
+/* 判断商户是否开通了营销激励*/
+export function isMarket (params) {
+  return fly.request({
+    url: '/merchant/market/is_market',
+    params: params,
+    headJson: true,
+    method: 'post'
+  })
+}
+
+/* 商户领劵*/
+export function getVoucher (params) {
+  return fly.request({
+    url: '/merchant/market/get_voucher',
+    params: params,
+    method: 'get'
+  })
+}
 /* 获取AppID*/
 // export function getAppID () {
 //   return fly.request({
@@ -243,5 +285,3 @@ export function getStoreName (params) {
 //     }
 //   })
 // }
-
-

@@ -16,10 +16,7 @@
 </template>
 
 <script>
-
-</script>
-<script>
-	import { wxLogin, baseURL, getDocmentTitle, wxLoginH5} from '../../api/vueAPI.js'
+	import { wxLogin, baseURL, getDocmentTitle, wxLoginH5, isMarket, getVoucher, getStoreName, getAppID } from '../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
   import MessageBox from 'muse-ui-message'
   import loading from '@/common/loading.js'
@@ -45,6 +42,7 @@
       localStorage.clear()
 		},
     mounted() {
+
       loading.show()
       console.log("created")
       /* 判断过期 */
@@ -143,14 +141,23 @@
         window.location.href = baseURL + "/order/app/wx_login?userId="+ this.$route.query.userId + queryStr // 跳转外部链接
         this.turnToLogin(this.reloadTime + 1)
       } else if (ua.match(/AlipayClient/i) == 'alipayclient'){
+
         // alert('zhifubaofence '+this.$route.query.fence)
         // this.getURL();
         let openId = this.$route.query.openId;
         let appId = this.$route.query.aliAppId;
-
         if(!openId){
           this.handleLogin();   //如果没有id才会调取授权页
         }
+        // const params = {
+        //   merchantId: this.$route.query.merchantId,
+        // }
+        //  isMarket(params).then(res => {
+        //    alert('ccscscscs')
+        //  }, err => {
+
+        //  })
+        //  return
         let uuid = initParams(this.$route.query.uuid)
         let equipmentId = initParams(this.$route.query.equipmentId)
         this.$router.push({
