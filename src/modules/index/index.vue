@@ -141,35 +141,49 @@
         window.location.href = baseURL + "/order/app/wx_login?userId="+ this.$route.query.userId + queryStr // 跳转外部链接
         this.turnToLogin(this.reloadTime + 1)
       } else if (ua.match(/AlipayClient/i) == 'alipayclient'){
-
-        // alert('zhifubaofence '+this.$route.query.fence)
-        // this.getURL();
         let openId = this.$route.query.openId;
         let appId = this.$route.query.aliAppId;
-        if(!openId){
-          this.handleLogin();   //如果没有id才会调取授权页
-        }
-        // const params = {
-        //   merchantId: this.$route.query.merchantId,
-        // }
-        //  isMarket(params).then(res => {
-        //    alert('ccscscscs')
-        //  }, err => {
-
-        //  })
-        //  return
-        let uuid = initParams(this.$route.query.uuid)
-        let equipmentId = initParams(this.$route.query.equipmentId)
-        this.$router.push({
-          path:'/zfb/paySuccess',
-          query:{
-            uuid: uuid,
-            equipmentId: equipmentId,
-            fence: this.$route.query.fence,
+          const params = {
             merchantId: this.$route.query.merchantId,
-            serviceId: this.$route.query.serviceId,
-          }	//传参
-        })
+          }
+           isMarket(params).then(res => {
+             if(res.code === 200 && res.msg == 'true') {
+               var paramsVal = 'merchantId=' + this.$route.query.merchantId +
+                               '&userId='+ this.$route.query.userId +
+                               '&serviceId='+ this.$route.query.serviceId +
+                               '&storeId=' + this.$route.query.storeId +
+                               '&uuid=' + this.$route.query.uuid +
+                               '&equipmentId=' + this.$route.query.equipmentId +
+                               '&openId=' + this.$route.query.openId +
+                               '&md5Str=' + this.$route.query.md5Str +
+                               '&timestramp=' + this.$route.query.timestramp +
+                               '&goodsOrderId=' + this.$route.query.goodsOrderId +
+                               '&hbFqNum=' + this.$route.query.hbFqNum +
+                               '&fence=' + this.$route.query.fence
+               window.location.href = 'alipays://platformapi/startapp?appId=2021002170637681&page=pages/index/index&query='+ encodeURIComponent(paramsVal)
+             } else {
+               // h5
+               if(!openId){
+                 this.handleLogin();   //如果没有id才会调取授权页
+               }
+               if(openId) {
+                 let uuid = initParams(this.$route.query.uuid)
+                 let equipmentId = initParams(this.$route.query.equipmentId)
+                 this.$router.push({
+                   path:'/zfb/paySuccess',
+                   query:{
+                     uuid: uuid,
+                     equipmentId: equipmentId,
+                     fence: this.$route.query.fence,
+                     merchantId: this.$route.query.merchantId,
+                     serviceId: this.$route.query.serviceId,
+                   }	//传参
+                 })
+               }
+             }
+           }, err => {
+              alert('cuowucuowu')
+           })
       } else {
         // 就在这里处理数据吧。
         // window.location.href = "https://baidu.com" // 跳转外部链接

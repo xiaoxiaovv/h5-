@@ -104,7 +104,7 @@
 </template>
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
 <script>
-	import {getWebPay, getMarketWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
+	import {getWebPay, getMerchantName, getStoreName, getGaoDeKey } from '../../../api/vueAPI.js'
   import { initParams } from '@/utils/initParams.js'
   import imgBg from '@/assets/iconimg/icon-shop.png'
   import imgCloseBg from '@/assets/iconimg/icon-close.png'
@@ -166,16 +166,9 @@
       }
     },
 
-		created() {//
-     // console.log("确认这个页面")
-      //let urls = this.$route.query;
-     // alert(JSON.stringify(urls))
+		created() {
       this.serviceId = this.$route.query.serviceId;
       this.merchantId = this.$route.query.merchantId;
-
-
-
-
       let equipmentId = initParams(this.$route.query.equipmentId)
       if (equipmentId) {
         this.equipmentId = equipmentId
@@ -183,26 +176,17 @@
 			this.htmlWidth = document.documentElement.clientWidth || document.body.clientWidth;
 			this.htmlheight = document.documentElement.clientHeight || document.body.clientHeight;
 			this.htmlProportion = this.htmlWidth / 750 ;
-			// console.log(this.htmlWidth);
-			// console.log(this.htmlheight);
       let payMoney = sessionStorage.getItem('totalPrice')
       if ( Number(payMoney) === 0) {
         payMoney = ''
       }
 			this.payMoney = payMoney
 			this.userId = sessionStorage.getItem('userId')
-      // alert('CREATuserid:'+this.userId)
 			let storeId = sessionStorage.getItem('storeId')
 			this.storeId = '';
 			if(storeId != null && storeId != '' && storeId){
 				this.storeId = storeId
 			}
-      //
-      // let params = {
-      //    merchantId: this.merchantId,
-      //    userId: this.$route.query.openId//支付宝userId
-      // }
-      // getVoucher(params).then(res => {}, err => {})
       // 电子围栏开关
       // let fence = sessionStorage.getItem('fence')
       // alert('1fence:'+this.fence)
@@ -629,7 +613,7 @@
       getWebPay(params){
         let params1 = JSON.stringify(params)
         // alert('提交params:'+params1)
-        getMarketWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
+        getWebPay(params/*2, this.payMoney, this.userId, this.storeId, uuid, equipmentId, this.remark, md5Str, timestramp, this.goodsOrderId, this.hbFqNum*/).then(res => {
 
           loading.hide();
           this.testProcess = '付款接口调取成功，进行付款跳转'

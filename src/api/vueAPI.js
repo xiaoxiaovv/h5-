@@ -260,11 +260,8 @@ export function getStoreName (params) {
 
 /* 判断商户是否开通了营销激励*/
 export function isMarket (params) {
-  return fly.request({
-    url: '/merchant/market/is_market',
-    params: params,
-    headJson: true,
-    method: 'post'
+  return fly.request('/merchant/market/is_market', qs.stringify(params),{
+  	method: 'post',
   })
 }
 
