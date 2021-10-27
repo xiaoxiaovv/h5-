@@ -160,7 +160,10 @@
                                '&goodsOrderId=' + this.$route.query.goodsOrderId +
                                '&hbFqNum=' + this.$route.query.hbFqNum +
                                '&fence=' + this.$route.query.fence
-               window.location.href = 'alipays://platformapi/startapp?appId=2021002170637681&page=pages/index/index&query='+ encodeURIComponent(paramsVal)
+
+
+               var appId1 = res.obj;
+               window.location.href = 'alipays://platformapi/startapp?appId='+appId1+'&page=pages/index/index&query='+ encodeURIComponent(paramsVal)
              } else {
                // h5
                if(!openId){
