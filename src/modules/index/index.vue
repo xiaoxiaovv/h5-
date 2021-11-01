@@ -185,7 +185,7 @@
                }
              }
            }, err => {
-              alert('cuowucuowu')
+
            })
       } else {
         // 就在这里处理数据吧。
